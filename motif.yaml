@@ -1,0 +1,59 @@
+# ============================================================================
+# MEME Motif Analysis Configuration
+# 单基因组 Motif 分析配置文件
+# ============================================================================
+
+# 输入 FASTA 序列文件 (必需)
+# 可以是蛋白质序列或 CDS 序列
+input_fasta: "/path/to/your/sequences.fa"
+
+# 输出目录 (必需)
+output_dir: "/path/to/output/meme_results"
+
+# 序列类型 (可选，默认: protein)
+# protein - 蛋白质序列
+# dna     - DNA/CDS 序列
+seq_type: "protein"
+
+# 发现的 motif 数量 (可选，默认: 10)
+nmotifs: 10
+
+# Motif 最小宽度 (可选，默认: 6)
+minw: 6
+
+# Motif 最大宽度 (可选，默认: 50)
+maxw: 50
+
+# MEME 额外参数 (可选)
+# 例如: "-mod zoops -revcomp"
+# zoops - Zero or One Occurrence Per Sequence
+# oops  - One Occurrence Per Sequence  
+# anr   - Any Number of Repetitions
+meme_options: ""
+
+# 线程数 (可选，默认: 4)
+threads: 4
+
+# ============================================================================
+# 使用示例
+# ============================================================================
+#
+# 1. 蛋白质序列 motif 分析:
+#    input_fasta: "/data/gene_family/proteins.fa"
+#    seq_type: "protein"
+#    nmotifs: 10
+#
+# 2. CDS 序列 motif 分析:
+#    input_fasta: "/data/gene_family/cds.fa"
+#    seq_type: "dna"
+#    nmotifs: 5
+#
+# 运行命令:
+#    bash PanFamily.sh Analysis motif -c Scripts/motif.yaml
+#
+# ============================================================================
+
+
+
+
+

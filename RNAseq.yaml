@@ -1,0 +1,43 @@
+# ============================================================================
+# PanFamily RNAseq Batch Analysis Configuration File
+# ============================================================================
+
+# Batch analysis settings
+batch_analysis:
+  data_dir: "/path/to/fastq/directory"       # Sequencing data directory
+  output_dir: "/path/to/output_dir"                                  # Batch results output directory
+  data_type: "PE"                                                # PE=paired-end, SE=single-end
+                  
+
+# Reference genome and annotation files
+reference:
+  genome_file: "/path/to/genome.fa"
+  annotation_file: "/path/to/annotation.gtf"
+
+# Analysis parameters
+analysis:
+  threads: 30                                # Number of threads
+  keep_intermediate: false                   # Keep intermediate files
+
+# Data processing parameters
+data_processing:
+  qc_before: true                            # Quality control before trimming
+  qc_after: true                             # Quality control after trimming
+  trimming: true                             # Perform trimming
+  trim_quality: 25                           # Trimming quality threshold
+  trim_length: 20                            # Minimum length threshold
+  fastqc_options: ""                         # Additional FastQC parameters
+
+# Differential expression analysis (optional)
+deg_analysis:
+  enabled: false                             # Enable differential analysis
+  group_file: ""                             # Sample grouping file (two columns: Control, Treatment, each column per line)
+  matrix_type: "count"                       # Matrix type to use: count, fpkm, tpm
+  pvalue_cutoff: 0.05                        # padj threshold
+  log2fc_cutoff: 1                           # log2FoldChange threshold
+
+# Gene family extraction (optional)
+gene_family:
+  genefamily_list: ""                        # Gene family member ID list file, one gene ID per line
+  genefamily_prefix: ""                      # Gene family naming prefix
+  extract_from_deg: false                    # Also extract gene family members from DEG results

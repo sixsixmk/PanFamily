@@ -1,0 +1,23 @@
+# PanKAKS Analysis Configuration File
+
+# --- Input files for gene family ---
+gene_family_pep: "/path/to/gene_family_pep.fasta"
+gene_family_cds: "/path/to/gene_family_cds.fasta"
+
+# --- Directories for all strains ---
+# Each strain must have <strain>.pep and <strain>.cds
+#strain.pep;strain.cds
+strains_pep_dir: "/path/to/pep"
+strains_cds_dir: "/path/to/cds"
+# --- Strain list ---
+# Comma-separated list OR path to file (one strain per line)
+strain_list: "/path/to/strain_list.txt"
+
+# --- Output directory ---
+output_dir: "/path/to/pan_kaks_output"
+
+# --- BLASTP Parameters ---
+blastp:
+  evalue: 1e-5
+  threads: 10
+  outfmt: 6

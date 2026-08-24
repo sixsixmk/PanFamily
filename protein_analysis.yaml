@@ -1,0 +1,47 @@
+# ============================================================================
+# Protein Physicochemical Properties Analysis Configuration
+# 单基因组蛋白理化性质分析配置文件
+# ============================================================================
+
+# 输入蛋白质 FASTA 文件 (必需)
+input_fasta: "/path/to/your/proteins.fa"
+
+# 输出目录 (必需)
+output_dir: "/path/to/output"
+
+# 输出文件前缀 (可选，默认: protein_properties)
+output_prefix: "protein_properties"
+
+# ============================================================================
+# 输出说明
+# ============================================================================
+#
+# 输出文件: <output_prefix>.csv
+#
+# 输出列:
+#   - ID                    : 蛋白ID
+#   - Protein_Length        : 蛋白长度 (aa)
+#   - Molecular_Weight_kDa  : 分子量 (kDa)
+#   - Isoelectric_Point     : 等电点 (pI)
+#   - Hydrophilicity        : 亲水性 (GRAVY)
+#                             负值 = 亲水性, 正值 = 疏水性
+#   - Aliphatic_Index       : 脂肪族指数 (热稳定性指标)
+#   - Instability_Index     : 不稳定指数
+#                             <40 = 稳定, >40 = 不稳定
+#
+# ============================================================================
+# 使用示例
+# ============================================================================
+#
+# 运行命令:
+#    bash PanFamily.sh Analysis protein -c Scripts/protein_analysis.yaml
+#
+# 或使用命令行参数:
+#    bash PanFamily.sh Analysis protein -i proteins.fa -o ./results
+#
+# ============================================================================
+
+
+
+
+

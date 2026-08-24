@@ -1,0 +1,92 @@
+# Example configuration file for Pan-transcriptome batch analysis
+# PanRNAseq Configuration File
+
+pan_analysis:
+  # List file (format: one sample per line, strain <tab> sample name)
+  strain_list: "/path/to/Sample_list.txt"
+  
+  # Transcriptome data directory (contains all sample fastq files)
+  transcriptome_dir: "/path/to/transcriptome_dir"
+  
+  # Genome directory (contains genomes for each strain: StrainA.fa, StrainB.fa, etc.)
+  genome_dir: "/path/to/genome_dir"
+  
+  # Annotation directory (contains annotation files for each strain: StrainA.gtf, StrainB.gtf, etc.)
+  annotation_dir: "/path/to/annotation_dir"
+  
+  # Output directory for results
+  output_dir: "/path/to/output_dir"
+  
+  # Data type: PE (paired-end) or SE (single-end)
+  data_type: "PE"
+
+# Analysis parameters
+analysis:
+  # Number of threads to use
+  threads: 10
+  
+  # Whether to keep intermediate files
+  keep_intermediate: false
+
+# Data processing parameters
+data_processing:
+  # Quality control for raw data (using FastQC)
+  qc_before: true
+  
+  # Quality control for processed data
+  qc_after: true
+  
+  # Whether to perform read trimming (using Trimmomatic)
+  trimming: true
+  
+  # Trimming quality threshold
+  trim_quality: 25
+  
+  # Minimum read length after trimming
+  trim_length: 35
+  
+  # Additional options for FastQC
+  fastqc_options: ""
+
+# Sample grouping file (shared by DEG and SV_pre analyses)
+sample_grouping:
+  group_file: "/path/to/Sample_grouping.txt"   # Sample grouping file (3 columns: Strain, Sample, Group)
+                                              # Example format:
+                                             # Strain    Sample    Group
+                                             # Strain1     Sample1   Control
+                                             # Strain1     Sample2   Treatment
+                                             # Strain2     Sample3   Control
+                                             # Strain2     Sample4   Treatment
+
+# Differential expression analysis (optional, applied to each strain)
+deg_analysis:
+  enabled: true                             # Whether to enable DEG analysis
+  matrix_type: "count"                       # Matrix type to use: count, fpkm, or tpm
+  pvalue_cutoff: 0.05                        # padj threshold
+  log2fc_cutoff: 1                           # log2FoldChange threshold
+
+# Gene family extraction (optional, applied to each strain)
+gene_family:
+  genefamily_list: "/path/to/genefamily_list.txt" # Gene family member ID list file, one gene ID per line
+  genefamily_prefix: "GENE_PREFIX"                # Gene family prefix
+  extract_from_deg: true                     # Whether to also extract from DEG results
+
+# Gene clustering and matrix integration (optional)
+gene_cluster:
+  enabled: true                              # Whether to enable gene clustering and matrix integration
+  cluster_file: "/path/to/idmap.txt"         # Gene clustering file (two columns: OriginalID, ClusterID; shared by all strains)
+                                             # Example format:
+                                             # OriginalID    ClusterID
+                                             # GENE1         GENE_RE1
+                                             # GENE2         GENE_RE2
+                                             # GENE3         GENE_RE3
+                                             # When multiple OriginalIDs map to the same ClusterID,
+                                             # their average expression will be calculated.
+                                             # Unmapped IDs will remain unchanged.
+  output_dir: "/path/to/gene_cluster_results"  # Output directory name for clustering and integration results
+  
+  # SV pre-analysis (only effective when gene_cluster is enabled)
+  sv_pre:
+    enabled: true                            # Whether to enable SV pre-analysis
+                                             # Extract the average expression of Control samples for each strain
+                                             # Used for structural variation and transcriptome correlation analysis

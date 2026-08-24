@@ -1,0 +1,30 @@
+#Gene Detection Configuration File
+# Method selection
+# true: enable the method
+# false: skip the method
+methods:
+  blastp: true/false
+  hmmer: true/false
+
+# Input files and output paths
+files:
+  # Protein sequence file of the target species
+  input_file: "path/to/target_proteins.fasta"
+  # Reference protein sequences of the gene family
+  seed: "path/to/reference_genefamily_proteins.fasta"
+  # HMM profile files, separated by commas; multiple HMMs can also be merged into one
+  hmm: "path/to/test1.hmm,path/to/test2.hmm"
+  # Output directory for the results
+  output_dir: "path/to/family_results"
+
+# Runtime parameters
+parameters:
+  # Number of threads
+  threads:  12
+  # E-value threshold for BLASTP
+  evalue_blast: 1e-5
+  # E-value threshold for HMMER
+  evalue_hmm: 1e-5
+  # Coverage threshold for HMMER domain filtering (default: 0.9)
+  coverage_threshold: 0.9
+

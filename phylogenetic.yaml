@@ -1,0 +1,22 @@
+# Phylogenetic Analysis Configuration File
+# Please modify the following parameters according to your needs
+
+# === Required Parameters ===
+# Input protein sequence file (FASTA format)
+INPUT_FILE="/path/to/protein_sequences.fasta"
+
+# Output file prefix
+OUTPUT_PREFIX="Test"
+
+# MAFFT alignment method (auto means automatically select the most suitable method)
+MAFFT_METHOD="auto"
+
+# Whether to run FastTree (T/F, recommended to use FastTree for maximum likelihood method)
+FASTTREE_RUN="T"
+
+# Whether to run trimAl to trim alignments (T/F, recommended to trim low-quality regions)
+TRIMAL_RUN="F"
+
+# === Optional Parameters ===
+# Number of MAFFT threads (default: 12)
+THREADS=12

@@ -1,0 +1,36 @@
+# PanPAV Configuration File
+# -------------------------
+# Gene family name or prefix. Used for naming BLAST databases and filtering.
+# Example: "TaTPS"
+name: "Test"
+
+# Path to the FASTA file containing representative sequences of the gene family.
+# This file will be used as the query in the BLASTP search.
+# Example: "/path/to/my/data/TaTPS_representatives.fasta"
+representatives: "/path/to/Name_representatives.fasta"
+
+# Path to the directory containing the protein files for each strain.
+# IMPORTANT: Files in this directory must be named '{strain_id}_genefamily_pep.fa'
+# Example: "/path/to/my/data/strain_proteins"
+protein_dir: "/path/to/pep"
+
+# Path to a text file containing the list of strain IDs, one ID per line.
+# These IDs must correspond to the filenames in the protein_dir.
+# Example: "/path/to/my/data/strain_ids.txt"
+id_file: "/path/to/strain_id.txt"
+
+# Path to the main output directory where all results and intermediate files will be stored.
+# The script will create subdirectories within this location.
+# Example: "/path/to/my/project/pav_results"
+output_dir: "/path/to/pav_results"
+
+# [Optional] Identity threshold for determining gene presence. Default is 90.
+# A BLAST hit with identity >= this value is considered "present" (1).
+identity_threshold: 90
+
+# [Optional] Threshold for classifying core genes. Default is 0.95.
+# A gene present in >= (this value * total strains) is considered a "core" gene.
+core_threshold: 0.95
+
+# [Optional] Number of threads for BLAST alignment. Default is 8.
+blast_threads: 8

@@ -1,0 +1,51 @@
+# Pan-genome Multi-method Gene Family Identification Configuration File
+
+# Gene family name (will be used as -N parameter for all runs)
+name: "TEST"
+
+# Method selection (at least one must be true)
+bitacora: T          # Run BITACORA analysis (T/F)
+hmmer: T             # Run HMMER analysis (T/F)  
+blastp: T            # Run BLASTP analysis (T/F)
+
+# Directory paths containing input files
+genome_dir: "/path/to/genome"      # Directory containing all genome files (required if bitacora=T)
+gff_dir: "/path/to/gff"           # Directory containing all GFF files (required if bitacora=T)
+protein_dir: "/path/to/pep"       # Directory containing all protein files (required for any method)
+querydir_bitacora: "/path/to/db"  # FPDB directory for BITACORA (required if bitacora=T)
+
+# Analysis parameters
+evalue: 1e-5                    # E-value threshold for BITACORA and BLASTP
+threads: 10                     # Number of threads
+
+# Pan-genome specific settings
+id_file: "/path/to/id.txt"       # File containing strain IDs (one per line)
+output_dir: "./test"        # Output directory for all results
+
+# BITACORA optional parameters
+clean: "T"                      # Clean output folders (T/F)
+addfilter: "T"                  # Additional filtering (T/F)
+filterlength: 30                # Filter length for additional filtering
+
+# HMMER/BLASTP specific parameters (required if respective methods are enabled)
+# Note: File names should match the 'name' setting above (e.g., if name="TEST", use "TEST_db.fasta" and "TEST_db.hmm")
+seed_file: "/path/to/db/TEST_db.fasta"               # Seed protein file for BLASTP (required if blastp=T)
+hmm_files: "/path/to/db/TEST_db.hmm"    # HMM files for HMMER, comma-separated (required if hmmer=T)
+evalue_hmm: 1e-5                                         # E-value threshold for HMMER
+
+# File naming convention (for reference):
+# Genome files should be named: {strain_id}.genome.fasta
+# GFF files should be named: {strain_id}.gff3  
+# Protein files should be named: {strain_id}.pep.fasta
+#
+# Example for strain "a":
+# - genome/a.genome.fasta
+# - gff3/a.gff3
+# - protein/a.pep.fasta
+
+# Method combination examples:
+# 1. BITACORA only: bitacora=T, hmmer=F, blastp=F
+# 2. HMMER only: bitacora=F, hmmer=T, blastp=F  
+# 3. BLASTP only: bitacora=F, hmmer=F, blastp=T
+# 4. HMMER + BLASTP: bitacora=F, hmmer=T, blastp=T
+# 5. All methods: bitacora=T, hmmer=T, blastp=T

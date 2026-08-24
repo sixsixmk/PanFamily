@@ -1,0 +1,47 @@
+# ========================================
+# SV ANNOVAR annotation config file template
+# ========================================
+
+# Path to reference genome FASTA file (required)
+REF_GENOME=/path/to/ref.fa
+
+# Path to GenePred annotation file (required)
+GENEPRED=/path/to/refGene.txt
+
+# Path to VCF file (optional, not needed if AVINPUT is provided)
+# VCF_FILE=/path/to/all_merge.vcf
+
+# Path to ANNOVAR input file (required)
+AVINPUT=/path/to/all_merge.avinput
+
+# Path to target gene family list (required)
+GENE_LIST=/path/to/gene_family.list
+
+# Output directory (required)
+OUTPUT_DIR=/path/to/output/SV_analysis
+
+# Genome build name (required)
+BUILD_VER=Ref
+
+# Upstream/downstream gene distance threshold in bp (optional, default 2000)
+NEARGENE=2000
+
+# Gene ID – strain mapping file (optional)
+# If provided, strain-level analysis and statistics will be performed
+# File format: two columns, tab-delimited
+#   gene1    Strain
+#   gene2    Strain
+#
+# If strain analysis is not needed, comment out or leave empty
+ID_STRAIN=/path/to/id_strain.txt
+
+# Gene ID mapping file (optional)
+# Used for gene renaming in pangenome analysis
+# File format: two columns, tab-delimited
+#   OriginalID    NewID
+#   gene1         Gene1
+#   gene2         Gene2
+# Note: This feature is independent of ID_STRAIN and can be used alone
+# Renaming applies to target_genes_sv.txt to generate target_genes_sv_renamed.txt
+# If renaming is not needed, comment out or leave empty
+IDMAP=/path/to/Idmap.txt

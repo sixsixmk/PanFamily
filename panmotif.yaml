@@ -1,0 +1,91 @@
+# ============================================================================
+# Pan-genome MEME Motif Analysis Configuration
+# 泛基因组 Motif 分析配置文件
+# ============================================================================
+
+# 品系名称列表文件 (必需)
+# 每行一个品系名，用于批量处理
+# 例如:
+#   Strain1
+#   Strain2
+#   Strain3
+strain_list: "/path/to/strain_list.txt"
+
+# 输入序列文件目录 (必需)
+# 包含所有品系的序列文件
+input_dir: "/path/to/input/sequences"
+
+# 输入文件命名模式 (必需)
+# 使用 {strain} 作为品系名占位符
+# 例如:
+#   "{strain}.tps.cds.fa"     -> Strain1.tps.cds.fa
+#   "{strain}_protein.fa"     -> Strain1_protein.fa
+#   "{strain}.gene_family.fa" -> Strain1.gene_family.fa
+input_pattern: "{strain}.tps.cds.fa"
+
+# 输出目录 (必需)
+output_dir: "/path/to/output/pan_meme_results"
+
+# 序列类型 (可选，默认: protein)
+# protein - 蛋白质序列
+# dna     - DNA/CDS 序列
+seq_type: "dna"
+
+# 每个品系发现的 motif 数量 (可选，默认: 10)
+nmotifs: 5
+
+# Motif 最小宽度 (可选，默认: 6)
+minw: 6
+
+# Motif 最大宽度 (可选，默认: 50)
+maxw: 50
+
+# MEME 额外参数 (可选)
+meme_options: ""
+
+# 并行处理的品系数 (可选，默认: 4)
+# 需要安装 GNU parallel
+threads: 4
+
+# 是否合并所有品系的结果 (可选，默认: true)
+merge_results: true
+
+# ============================================================================
+# 目录结构示例
+# ============================================================================
+#
+# 输入目录结构:
+# input_dir/
+# ├── Strain1.tps.cds.fa
+# ├── Strain2.tps.cds.fa
+# ├── Strain3.tps.cds.fa
+# └── ...
+#
+# strain_list.txt:
+# Strain1
+# Strain2
+# Strain3
+#
+# 输出目录结构:
+# output_dir/
+# ├── Strain1_meme/
+# │   ├── meme.html      # 交互式 HTML 报告
+# │   ├── meme.txt       # 文本格式结果
+# │   ├── meme.xml       # XML 格式结果
+# │   └── logo*.png      # Motif 序列 logo
+# ├── Strain2_meme/
+# │   └── ...
+# ├── merged_motifs/
+# │   ├── all_motifs_summary.txt
+# │   └── motif_comparison.csv
+# └── pan_motif_report.txt
+#
+# ============================================================================
+# 使用示例
+# ============================================================================
+#
+# 运行命令:
+#    bash PanFamily.sh Analysis panmotif -c Scripts/panmotif.yaml
+#
+# ============================================================================
+

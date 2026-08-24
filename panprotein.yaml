@@ -1,0 +1,68 @@
+# ============================================================================
+# Pan-genome Protein Physicochemical Properties Analysis Configuration
+# 泛基因组蛋白理化性质分析配置文件
+# ============================================================================
+
+# 品系名称列表文件 (必需)
+# 每行一个品系名
+# 例如:
+#   Strain1
+#   Strain2
+#   Strain3
+strain_list: "/path/to/strain_list.txt"
+
+# 输入序列文件目录 (必需)
+input_dir: "/path/to/protein_files"
+
+# 输入文件命名模式 (必需)
+# 使用 {strain} 作为品系名占位符
+# 例如:
+#   "{strain}.protein.fa"  -> Strain1.protein.fa
+#   "{strain}.pep.fa"      -> Strain1.pep.fa
+#   "{strain}_protein.fasta" -> Strain1_protein.fasta
+input_pattern: "{strain}.protein.fa"
+
+# 输出目录 (必需)
+output_dir: "/path/to/output"
+
+# 并行处理的品系数 (可选，默认: 4)
+# 需要安装 GNU parallel
+threads: 4
+
+# 是否合并所有品系的结果 (可选，默认: true)
+merge_results: true
+
+# ============================================================================
+# 目录结构示例
+# ============================================================================
+#
+# 输入目录结构:
+# input_dir/
+# ├── Strain1.protein.fa
+# ├── Strain2.protein.fa
+# ├── Strain3.protein.fa
+# └── ...
+#
+# strain_list.txt:
+# Strain1
+# Strain2
+# Strain3
+#
+# 输出目录结构:
+# output_dir/
+# ├── Strain1_properties.csv    # 各品系单独结果
+# ├── Strain2_properties.csv
+# ├── Strain3_properties.csv
+# ├── merged_properties.csv     # 合并的所有结果
+# ├── properties_summary.csv    # 各品系统计摘要
+# └── pan_protein_report.txt    # 分析报告
+#
+# ============================================================================
+# 使用示例
+# ============================================================================
+#
+# 运行命令:
+#    bash PanFamily.sh Analysis panprotein -c Scripts/panprotein.yaml
+#
+# ============================================================================
+

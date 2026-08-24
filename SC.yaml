@@ -1,0 +1,147 @@
+# ============================================================================
+# PanFamily Single Cell RNA-seq Analysis Configuration File
+# Includes CellRanger Integration Features
+# ============================================================================
+
+# Project basic information
+project:
+  project_name: PanFamily_scRNA_CellRanger
+  description: Single cell RNA-seq analysis with CellRanger integration
+
+# Execution mode configuration
+execution:
+  mode: interactive  # interactive or batch
+  interactive_settings:
+    steps:
+      quality_control: yes
+      pca_selection: yes
+      branch_analysis: yes
+
+# Computing resource configuration
+resources:
+  cores: 30
+  memory_limit: 16G
+
+# Advanced options
+advanced:
+  save_intermediate_objects: yes
+  verbose: yes
+  log_level: INFO
+
+# ============================================================================
+# CellRanger Configuration (Optional)
+# ============================================================================
+cellranger:
+  # Whether to enable CellRanger workflow
+  enabled: true  # true: run CellRanger, false: skip, use matrix files directly
+  
+  # CellRanger executable path (if in PATH, just write cellranger)
+  cellranger_path: cellranger
+  
+  # CellRanger mkref configuration (create reference genome)
+  mkref:
+    enabled: true  # true: create new reference genome, false: use existing reference genome
+    genome_name: Test  # Reference genome name
+    fasta_file: /path/to/gene.fa  # FASTA file path
+    gtf_file: /path/to/genes.gtf  # GTF annotation file path
+    nthreads: 16  # Optional: number of threads
+  
+  # CellRanger count configuration (quantification analysis)
+  count:
+    enabled: true  # true: run count, false: skip
+    sample_id: test  # Sample ID, output directory name
+    transcriptome: /home/data/tps/sc2/at/ath  # Transcriptome reference path (must be provided if not running mkref)
+    fastqs_dir: /home/data/tps/sc/test/whole_root_Heatshock  # FASTQ file directory
+    sample_name: HOT  # Sample name (matches FASTQ file prefix)
+    
+    # Optional parameters
+    force_cells: 8000  # Force cell count
+    # expect_cells: 5000  # Expected cell count (choose one with force_cells)
+    localcores: 30  # Number of cores to use
+    localmem: 64  # Memory to use (GB)
+    create_bam: false  # Whether to create BAM files
+
+# ============================================================================
+# Data Configuration
+# ============================================================================
+data:
+  # If not using CellRanger, provide matrix file path directly
+  # If using CellRanger, this path will be automatically updated with CellRanger output
+  data_dir: /home/data/tps/sc2/at/CRA001559/Root/outs/filtered_feature_bc_matrix
+  
+  # Target gene list (for gene family analysis)
+  target_gene_list: /home/data/tps/tpstool/sctest/attps_fixed.txt
+  
+  # Cell type annotation database
+  annotation_db: /home/data/tps/sc2/at/root.xlsx
+
+# Output configuration
+output:
+  base_dir: panfamily_results
+
+# ============================================================================
+# Quality Control Parameters
+# ============================================================================
+quality_control:
+  min_cells_per_feature: 3
+  min_features_per_cell: 482
+  max_features_per_cell: 5000
+  max_count_per_cell: 30000
+  max_mt_percent: 5.0
+  max_cg_percent: 20.0
+  plant_specific:
+    mitochondrial_pattern: ATMT
+    chloroplast_pattern: ATCG
+
+# ============================================================================
+# Seurat Analysis Parameters
+# ============================================================================
+seurat:
+  normalization:
+    method: LogNormalize
+    scale_factor: 10000
+  variable_features:
+    method: vst
+    n_features: 2000
+  pca:
+    n_pcs_compute: 50
+    n_pcs_use: 10
+  clustering:
+    resolution: 0.5
+    algorithm: 1
+
+# ============================================================================
+# Cell Type Annotation
+# ============================================================================
+cell_annotation:
+  method: scMayoMap
+  scmayomap:
+    database_file: /home/data/tps/sc2/at/root.xlsx
+    score_threshold: 0.1
+
+# ============================================================================
+# Target Gene Analysis
+# ============================================================================
+target_gene_analysis:
+  enabled: yes
+  gene_list_file: /home/data/tps/tpstool/sctest/attps_fixed.txt
+  plot_params:
+    ncol: 4
+    feature_plot:
+      width: 10
+      height: 8
+
+# ============================================================================
+# Pseudotime Analysis
+# ============================================================================
+pseudotime:
+  enabled: yes
+  monocle2_params:
+    min_expr: 0.1
+    max_components: 2
+    reduction_method: DDRTree
+    branch_point: 1
+  branch_analysis:
+    enabled: yes
+    branch_point: 1
+

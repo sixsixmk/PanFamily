@@ -1,0 +1,16 @@
+# Reference genome protein sequence file 
+REF_PROTEIN=/path/to/Reference.fasta
+# Query protein sequence file 
+QUERY_PROTEIN=/path/to/Gene_family.fasta
+
+# Output directory 
+OUTPUT_DIR=/path/to/output/blastp_mapping
+
+# Identity threshold (optional, default 100)
+IDENTITY=100
+
+# E-value threshold (optional, default 1e-5)
+EVALUE=1e-5
+
+# Number of threads (optional, default 8)
+THREADS=8

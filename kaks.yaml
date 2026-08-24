@@ -1,0 +1,28 @@
+################################################################################
+# Ka/Ks Analysis Configuration File
+################################################################################
+
+# Gene family protein sequences (FASTA format)
+gene_family_pep: "/path/to/gene_family_pep.fasta"
+
+# Gene family CDS sequences (FASTA format)
+gene_family_cds: "/path/to/gene_family_cds.fasta"
+
+# Genome protein sequences (FASTA format)
+genome_pep: "/path/to/genome_pep.fasta"
+
+# Genome CDS sequences (FASTA format)
+genome_cds: "/path/to/genome_cds.fasta"
+
+# Output directory for all results
+output_dir: "/path/to/kaks_analysis_output"
+
+# BLASTP Parameters
+blastp:
+  evalue: 1e-5
+  threads: 10
+  outfmt: 6
+
+# Processor file path
+processor_file: "/path/to/processor.file"
+

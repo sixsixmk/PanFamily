@@ -1,0 +1,12 @@
+# Input parameters
+INPUT_FASTA: "/path/to/genome_pep.fasta"
+OUTPUT_DIR: "/path/to/results"
+GENE_PREFIX: "GENE_PREFIX"
+IDENTITY_THRESHOLD: "90.0"
+
+# BLAST parameters
+BLAST_OUTFMT: "6"
+BLAST_THREADS: "8"
+
+
+
