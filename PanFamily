@@ -1,0 +1,513 @@
+#!/bin/bash
+
+# ============================================================================
+# PanFamily 
+# ============================================================================
+
+set -euo pipefail
+
+PROGRAM_NAME="PanFamily"
+VERSION="1.0"
+
+log_info() {
+    echo "[INFO] $(date '+%Y-%m-%d %H:%M:%S') - $1"
+}
+
+log_error() {
+    echo "[ERROR] $(date '+%Y-%m-%d %H:%M:%S') - $1" >&2
+}
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
+SCRIPTS_DIR="${SCRIPT_DIR}/Scripts"
+VIS_DIR="${SCRIPT_DIR}/Visualization"
+
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+WHITE='\033[0;37m'
+PURPLE='\033[0;35m'
+BOLD='\033[1m'
+DIM='\033[2m'
+NC='\033[0m'
+RESET='\033[0m'
+
+print_banner() {
+    echo -e "${PURPLE}"
+    echo "========================================================================"
+    echo "  ____               _____                _ _       "
+    echo " |  _ \ __ _ _ __    |  ___|_ _ _ __ ___ (_) |_   _ "
+    echo " | |_) / _\` | '_ \   | |_ / _\` | '_ \` _ \| | | | | |"
+    echo " |  __/ (_| | | | |  |  _| (_| | | | | | | | | |_| |"
+    echo " |_|   \__,_|_| |_|  |_|  \__,_|_| |_| |_|_|_|\__, |"
+    echo "                                             |___/ "
+    echo "                Gene Family Analysis Toolkit"
+    echo "                     Version $VERSION"
+    echo "========================================================================"
+    echo -e "${NC}"
+}
+
+print_usage() {
+    cat << EOF
+$PROGRAM_NAME - Gene Family Analysis Toolkit
+
+USAGE:
+    $0 <MODULE> [MODULE_OPTIONS]
+
+AVAILABLE MODULES:
+    PanDetection       Pan-genome multi-method gene family identification
+                      Usage: $0 PanDetection -c <config.yaml> [--dry-run]
+
+    GeneDetection      Single-species gene family identification
+                      Usage: $0 GeneDetection -c <config.yaml>
+                      Usage: $0 GeneDetection --method <method> -i <input> -o <o> [options]
+
+    scRNA              Single-cell RNA analysis module
+                      Usage: $0 scRNA -c <config.yaml>
+
+    RNAseq             Single-genome RNA-seq analysis
+                      Usage: $0 RNAseq -c <config.yaml>
+
+    PanRNAseq          Pan-genome RNA-seq analysis
+                      Usage: $0 PanRNAseq -c <config.yaml>
+
+    Analysis           Pan-genome analysis modules
+                      Usage: $0 Analysis <submodule> -c <config.yaml>
+                      Submodules: pangenelist, PAV, Phylogenetic, KaKs, PanKaKs, SV, MaptoRef, motif, panmotif, protein, panprotein, collinearity
+
+    -V, Visualize      Auto-matching visualization module
+                      Usage: $0 -V -i <input_dir> -o <output_dir> [options]
+                      Auto-matches V_xxx.csv/tsv/xlsx files with V_xxx.R scripts
+
+GLOBAL OPTIONS:
+    -h, --help         Show this help message
+    --version          Show version information
+    --list-modules     List available modules
+    --module-help      Show help for specific module
+
+EXAMPLES:
+    # Pan-genome analysis using YAML config
+    $0 PanDetection -c pan_config.yaml
+
+    # Single-species analysis using YAML config
+    $0 GeneDetection -c gene_config.yaml
+
+    # Single-species analysis using command line parameters
+    $0 GeneDetection --method both -i proteins.fa -o results --seed seeds.fa --hmm model.hmm
+
+    # Pan-genome gene family list analysis
+    $0 Analysis pangenelist -c Scripts/PanGeneFamily_list.yaml
+
+    # Phylogenetic analysis
+    $0 Analysis Phylogenetic -c phylogenetic.yaml
+
+    # Pan-genome PAV analysis
+    $0 Analysis PAV -c Scripts/PanPAV.yaml
+
+    # Single-cell RNA analysis
+    $0 scRNA -c Scripts/SC.yaml
+
+    # RNA-seq analysis
+    $0 RNAseq -c Scripts/RNAseq.yaml
+    $0 PanRNAseq -c Scripts/PanRNAseq.yaml
+
+    # Ka/Ks analysis
+    $0 Analysis KaKs -c Scripts/kaks.yaml
+    $0 Analysis PanKaKs -c Scripts/pankaks.yaml
+
+    # SV analysis
+    $0 Analysis SV -c Scripts/sv.yaml
+
+    # MaptoRef analysis
+    $0 Analysis MaptoRef -c Scripts/maptoref.yaml
+
+    # Motif analysis
+    $0 Analysis motif -c Scripts/motif.yaml
+    $0 Analysis panmotif -c Scripts/panmotif.yaml
+
+    # Protein physicochemical properties analysis
+    $0 Analysis protein -c Scripts/protein_analysis.yaml
+    $0 Analysis panprotein -c Scripts/panprotein.yaml
+
+    # Collinearity analysis (MCScanX)
+    $0 Analysis collinearity -c Scripts/collinearity.yaml
+
+    # Visualization module (auto-matching)
+    $0 -V -i ./results/ -o ./plots/
+
+    # Show module-specific help
+    $0 PanDetection --help
+    $0 GeneDetection --help
+    $0 scRNA --help
+    $0 RNAseq --help
+    $0 PanRNAseq --help
+    $0 Analysis --help
+
+EOF
+}
+
+list_modules() {
+    cat << EOF
+Available PanFamily modules:
+
+1. PanDetection
+   Description: Pan-genome multi-method gene family identification
+   Script: ${SCRIPTS_DIR}/PanDetection.sh
+   Methods: BITACORA, HMMER, BLASTP
+   Input: Multiple genomes/proteomes
+   Config: YAML only
+
+2. GeneDetection  
+   Description: Single-species gene family identification
+   Script: ${SCRIPTS_DIR}/gene_detection.sh
+   Methods: BLASTP, HMMER
+   Input: Single proteome
+   Config: YAML or command line parameters
+
+3. scRNA
+   Description: Single-cell RNA analysis module
+   Script: ${SCRIPTS_DIR}/scRNA.sh
+   Input: Single-cell RNA data
+   Config: YAML only
+
+4. RNAseq
+   Description: Single-genome RNA-seq differential expression analysis
+   Script: ${SCRIPTS_DIR}/RNAseq.sh
+   Input: RNA-seq count data
+   Config: YAML only
+
+5. PanRNAseq
+   Description: Pan-genome RNA-seq analysis
+   Script: ${SCRIPTS_DIR}/PanRNAseq.sh
+   Input: Multiple RNA-seq datasets
+   Config: YAML only
+
+6. Analysis
+   Description: Pan-genome analysis modules
+   Submodules:
+   - pangenelist: Pan-genome gene family clustering and analysis
+     Script: ${SCRIPTS_DIR}/PanGeneFamily_list.sh
+     Config: ${SCRIPTS_DIR}/PanGeneFamily_list.yaml
+   - PAV: Presence/Absence Variation analysis
+     Script: ${SCRIPTS_DIR}/PanPAV.sh
+     Config: ${SCRIPTS_DIR}/PanPAV.yaml
+   - Phylogenetic: Phylogenetic analysis and tree construction
+     Script: ${SCRIPTS_DIR}/Phylogenetic.sh
+     Config: phylogenetic.yaml
+   - KaKs: Ka/Ks ratio calculation for single genome
+     Script: ${SCRIPTS_DIR}/KAKS.sh
+     Config: Scripts/kaks.yaml
+   - PanKaKs: Ka/Ks ratio calculation for pan-genome
+     Script: ${SCRIPTS_DIR}/PanKAKS.sh
+     Config: Scripts/pankaks.yaml
+   - SV: Structural variant annotation analysis
+     Script: ${SCRIPTS_DIR}/sv_analysis.sh
+     Config: Scripts/sv.yaml
+   - MaptoRef: BLASTP-based gene mapping to reference
+     Script: ${SCRIPTS_DIR}/maptoref.sh
+     Config: Scripts/maptoref.yaml
+   - motif: Single-genome MEME motif analysis
+     Script: ${SCRIPTS_DIR}/MEME.sh
+     Config: Scripts/motif.yaml
+   - panmotif: Pan-genome MEME motif analysis
+     Script: ${SCRIPTS_DIR}/PanMEME.sh
+     Config: Scripts/panmotif.yaml
+   - protein: Single-genome protein physicochemical properties analysis
+     Script: ${SCRIPTS_DIR}/ProteinProperty.sh
+     Config: Scripts/protein_analysis.yaml
+   - panprotein: Pan-genome protein physicochemical properties analysis
+     Script: ${SCRIPTS_DIR}/PanProteinProperty.sh
+     Config: Scripts/panprotein.yaml
+   - collinearity: Collinearity/Synteny analysis (MCScanX)
+     Script: ${SCRIPTS_DIR}/Collinearity.sh
+     Config: Scripts/collinearity.yaml
+
+7. Visualize (-V)
+   Description: Auto-matching visualization module
+   Script: ${SCRIPTS_DIR}/Visualize.sh
+   Directory: ${VIS_DIR}/
+   Naming: V_<type>.csv/tsv/xlsx -> V_<type>.R
+   Supported types: cis, phylo, expression, structure, motif, 
+                   collinearity, kaks, pav, enrichment, network
+
+EOF
+}
+
+check_module() {
+    local module="$1"
+    local submodule="$2"
+    local module_script=""
+    
+    if [[ "$module" == "Analysis" ]]; then
+        if [[ -z "$submodule" ]]; then
+            log_error "Analysis module requires a submodule. Available submodules: pangenelist, PAV, Phylogenetic, KaKs, PanKaKs, SV, MaptoRef, motif, panmotif, protein, panprotein, collinearity"
+            log_error "Usage: $0 Analysis <submodule> -c <config.yaml>"
+            exit 1
+        fi
+        
+        case "$submodule" in
+            "pangenelist")
+                module_script="${SCRIPTS_DIR}/PanGeneFamily_list.sh"
+                ;;
+            "PAV")
+                module_script="${SCRIPTS_DIR}/PanPAV.sh"
+                ;;
+            "Phylogenetic")
+                module_script="${SCRIPTS_DIR}/Phylogenetic.sh"
+                ;;
+            "KaKs")
+                module_script="${SCRIPTS_DIR}/KAKS.sh"
+                ;;
+            "PanKaKs")
+                module_script="${SCRIPTS_DIR}/PanKAKS.sh"
+                ;;
+            "SV")
+                module_script="${SCRIPTS_DIR}/sv_analysis.sh"
+                ;;
+            "MaptoRef")
+                module_script="${SCRIPTS_DIR}/maptoref.sh"
+                ;;
+            "motif")
+                module_script="${SCRIPTS_DIR}/MEME.sh"
+                ;;
+            "panmotif")
+                module_script="${SCRIPTS_DIR}/PanMEME.sh"
+                ;;
+            "protein")
+                module_script="${SCRIPTS_DIR}/ProteinProperty.sh"
+                ;;
+            "panprotein")
+                module_script="${SCRIPTS_DIR}/PanProteinProperty.sh"
+                ;;
+            "collinearity")
+                module_script="${SCRIPTS_DIR}/Collinearity.sh"
+                ;;
+            *)
+                log_error "Unknown Analysis submodule: $submodule"
+                log_error "Available submodules: pangenelist, PAV, Phylogenetic, KaKs, PanKaKs, SV, MaptoRef, motif, panmotif, protein, panprotein, collinearity"
+                exit 1
+                ;;
+        esac
+    else
+        case "$module" in
+            "GeneDetection")
+                module_script="${SCRIPTS_DIR}/gene_detection.sh"
+                ;;
+            "scRNA")
+                module_script="${SCRIPTS_DIR}/scRNA.sh"
+                ;;
+            "RNAseq")
+                module_script="${SCRIPTS_DIR}/RNAseq.sh"
+                ;;
+            "PanRNAseq")
+                module_script="${SCRIPTS_DIR}/PanRNAseq.sh"
+                ;;
+            *)
+                module_script="${SCRIPTS_DIR}/${module}.sh"
+                ;;
+        esac
+    fi
+    
+    if [[ ! -f "$module_script" ]]; then
+        log_error "Module script not found: $module_script"
+        log_error "Available modules:"
+        list_modules
+        exit 1
+    fi
+    
+    if [[ ! -x "$module_script" ]]; then
+        log_error "Module script is not executable: $module_script"
+        exit 1
+    fi
+    
+    return 0
+}
+
+call_module() {
+    local module="$1"
+    local submodule="$2"
+    local module_script=""
+    shift 2  # 将 module 和 submodule 移出参数列表
+    
+    if [[ "$module" == "Analysis" ]]; then
+        case "$submodule" in
+            "pangenelist")
+                module_script="${SCRIPTS_DIR}/PanGeneFamily_list.sh"
+                ;;
+            "PAV")
+                module_script="${SCRIPTS_DIR}/PanPAV.sh"
+                ;;
+            "Phylogenetic")
+                module_script="${SCRIPTS_DIR}/Phylogenetic.sh"
+                ;;
+            "KaKs")
+                module_script="${SCRIPTS_DIR}/KAKS.sh"
+                ;;
+            "PanKaKs")
+                module_script="${SCRIPTS_DIR}/PanKAKS.sh"
+                ;;
+            "SV")
+                module_script="${SCRIPTS_DIR}/sv_analysis.sh"
+                ;;
+            "MaptoRef")
+                module_script="${SCRIPTS_DIR}/maptoref.sh"
+                ;;
+            "motif")
+                module_script="${SCRIPTS_DIR}/MEME.sh"
+                ;;
+            "panmotif")
+                module_script="${SCRIPTS_DIR}/PanMEME.sh"
+                ;;
+            "protein")
+                module_script="${SCRIPTS_DIR}/ProteinProperty.sh"
+                ;;
+            "panprotein")
+                module_script="${SCRIPTS_DIR}/PanProteinProperty.sh"
+                ;;
+            "collinearity")
+                module_script="${SCRIPTS_DIR}/Collinearity.sh"
+                ;;
+        esac
+        
+        log_info "Calling Analysis module: $submodule"
+        log_info "Module script: $module_script"
+        log_info "Module arguments: $*"
+    else
+        case "$module" in
+            "GeneDetection")
+                module_script="${SCRIPTS_DIR}/gene_detection.sh"
+                ;;
+            "scRNA")
+                module_script="${SCRIPTS_DIR}/scRNA.sh"
+                ;;
+            "RNAseq")
+                module_script="${SCRIPTS_DIR}/RNAseq.sh"
+                ;;
+            "PanRNAseq")
+                module_script="${SCRIPTS_DIR}/PanRNAseq.sh"
+                ;;
+            *)
+                module_script="${SCRIPTS_DIR}/${module}.sh"
+                ;;
+        esac
+        
+        log_info "Calling module: $module"
+        log_info "Module script: $module_script"
+        log_info "Module arguments: $*"
+        
+    fi
+    
+    # 使用 exec 将控制权完全交给子脚本
+    # $@ 会保留所有参数的引号和空格
+    exec "$module_script" "$@"
+}
+
+main() {
+    print_banner
+    
+
+    if [[ $# -eq 0 ]]; then
+        print_usage
+        exit 1
+    fi
+    
+
+    case "$1" in
+        -h|--help)
+            print_usage
+            exit 0
+            ;;
+        --version)
+            echo "$PROGRAM_NAME version $VERSION"
+            exit 0
+            ;;
+        --list-modules)
+            list_modules
+            exit 0
+            ;;
+        -V|Visualize)
+            # 可视化模块 - 直接转发所有参数给 Visualize.sh
+            shift
+            VIS_SCRIPT="${SCRIPTS_DIR}/Visualize.sh"
+            if [[ ! -f "$VIS_SCRIPT" ]]; then
+                log_error "Visualization script not found: $VIS_SCRIPT"
+                exit 1
+            fi
+            if [[ ! -x "$VIS_SCRIPT" ]]; then
+                chmod +x "$VIS_SCRIPT"
+            fi
+            log_info "Calling Visualization module"
+            exec "$VIS_SCRIPT" "$@"
+            ;;
+        --module-help)
+            if [[ $# -lt 2 ]]; then
+                log_error "--module-help requires module name"
+                exit 1
+            fi
+            MODULE="$2"
+            if [[ "$MODULE" == "Analysis" ]]; then
+                echo "Analysis Module Help:"
+                echo "Usage: $0 Analysis <submodule> -c <config.yaml>"
+                echo ""
+                echo "Available submodules:"
+                echo "  pangenelist  - Pan-genome gene family clustering and analysis"
+                echo "  PAV          - Presence/Absence Variation analysis"
+                echo "  Phylogenetic - Phylogenetic analysis and tree construction"
+                echo "  KaKs         - Ka/Ks ratio calculation for single genome"
+                echo "  PanKaKs      - Ka/Ks ratio calculation for pan-genome"
+                echo "  SV           - Structural variant annotation analysis"
+                echo "  MaptoRef     - BLASTP-based gene mapping to reference"
+                echo "  motif        - Single-genome MEME motif analysis"
+                echo "  panmotif     - Pan-genome MEME motif analysis"
+                echo "  protein      - Single-genome protein physicochemical properties analysis"
+                echo "  panprotein   - Pan-genome protein physicochemical properties analysis"
+                echo "  collinearity - Collinearity/Synteny analysis (MCScanX)"
+                echo ""
+                echo "Examples:"
+                echo "  $0 Analysis pangenelist -c Scripts/PanGeneFamily_list.yaml"
+                echo "  $0 Analysis PAV -c Scripts/PanPAV.yaml"
+                echo "  $0 Analysis Phylogenetic -c phylogenetic.yaml"
+                echo "  $0 Analysis KaKs -c Scripts/kaks.yaml"
+                echo "  $0 Analysis PanKaKs -c Scripts/pankaks.yaml"
+                echo "  $0 Analysis SV -c Scripts/sv.yaml"
+                echo "  $0 Analysis MaptoRef -c Scripts/maptoref.yaml"
+                echo "  $0 Analysis motif -c Scripts/motif.yaml"
+                echo "  $0 Analysis panmotif -c Scripts/panmotif.yaml"
+                echo "  $0 Analysis protein -c Scripts/protein_analysis.yaml"
+                echo "  $0 Analysis panprotein -c Scripts/panprotein.yaml"
+                echo "  $0 Analysis collinearity -c Scripts/collinearity.yaml"
+            else
+                check_module "$MODULE" ""
+                call_module "$MODULE" "" --help
+            fi
+            exit 0
+            ;;
+    esac
+    
+    MODULE="$1"
+    shift
+    
+    if [[ "$MODULE" == "Analysis" ]]; then
+        if [[ $# -eq 0 ]]; then
+            log_error "Analysis module requires a submodule"
+            log_error "Usage: $0 Analysis <submodule> -c <config.yaml>"
+            log_error "Available submodules: pangenelist, PAV, Phylogenetic, KaKs, PanKaKs, SV, MaptoRef, motif, panmotif, protein, panprotein, collinearity"
+            exit 1
+        fi
+        SUBMODULE="$1"
+        shift
+        
+        check_module "$MODULE" "$SUBMODULE"
+        
+        call_module "$MODULE" "$SUBMODULE" "$@"
+    else
+        check_module "$MODULE" ""
+        call_module "$MODULE" "" "$@"
+    fi
+}
+
+trap 'log_error "PanFamily execution failed on line $LINENO"' ERR
+
+main "$@"
