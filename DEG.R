@@ -3,7 +3,6 @@ if (!require("DESeq2"))
         install.packages("BiocManager")
 
     BiocManager::install("DESeq2")
-
 library(DESeq2)
 
 deseq2 <- function(subcountMatrix, sampleInfo, pvalue_cutoff, log2fc_cutoff) {
