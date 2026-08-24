@@ -1,5 +1,4 @@
 #!/usr/bin/perl
-#
 #    pal2nal.pl  (v14; January 6, 2012)   Zhang Zhang (zhangzhang@big.ac.cn)
 #      Note: Support axt-formatted sequences
 #      The source codes are allowed for modifications by the courtesy of Dr. Mikita Suyama.
